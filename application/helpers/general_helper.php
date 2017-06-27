@@ -7,6 +7,26 @@ function get_site_title()
 	return $CI->config->item('site_title');
 }
 
+function get_site_name()
+{
+	$CI =& get_instance();
+
+	return $CI->config->item('site_name');
+}
+
+function get_user()
+{
+	$CI =& get_instance();
+
+	return $CI->auth->get_user();
+}
+
+function get_random_contextual_class()
+{
+	$class = array('default', 'info', 'success', 'warning', 'danger');
+	return $class[rand(0,4)];
+}
+
 function get_css($optional = FALSE)
 {
 	$CI =& get_instance();
@@ -88,4 +108,38 @@ function dump_and_die($param, $pre = TRUE)
 	if ($pre) {
 		echo "</pre>";
 	}
+
+	die();
+}
+
+function set_message($message = "", $alert_class = 'alert-success')
+{
+	$CI =& get_instance();
+
+	$m = new stdClass();
+	$m->alert_class = $alert_class;
+	$m->message = $message;
+
+	$CI->session->set_flashdata('message', $m);
+}
+
+function print_alert_temp($time = 3000, $bar_class = 'success', $alert_class = 'info', $message = '')
+{
+	$template =  "<div class='alert-temp' data-time='%s'>
+		<div class='progress progress-temp no-margin-bottom'>
+			<div class='progress-bar progress-bar-%s' role='progressbar' aria-valuemin='0' aria-valuemax='100'>
+			</div>
+		</div>
+		<div class='alert alert-%s'>
+			<h4 class='no-margin'>%s</h4>
+		</div>
+	</div>";
+
+	return sprintf($template, $time, $bar_class, $alert_class, $message);
+}
+
+function date_($date)
+{
+	$CI =& get_instance();
+	return date($CI->config->item('date_format'), $date);
 }

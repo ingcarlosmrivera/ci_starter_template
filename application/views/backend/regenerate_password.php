@@ -45,37 +45,32 @@
           <?= validation_errors("<li class='error'>", '</li>') ?>
         </ul>
       <?php endif ?>
-
-      <p class="no-margin text-center padding-bottom-10">Sign in to start your session</p>      
-
+      
+      <p class="no-margin text-center padding-bottom-10">
+        <?= sprintf('Welcome back <strong>%s</strong>, your email <strong>(%s)</strong> was found. Please enter and confirm your new password', $user->first_name, $user->email) ?>
+      </p>
+      
       <form method="post">
         <div class="form-group has-feedback">
-          <input type="email" name="email" class="form-control" placeholder="Email" value="<?= set_value('email') ?>">
-          <span class="fa fa-envelope-o form-control-feedback"></span>
+          <input type="password" name="password" class="form-control" placeholder="Nueva contraseña" value="<?= set_value('password') ?>" required>
+          <span class="fa fa-slack form-control-feedback"></span>
         </div>
+
         <div class="form-group has-feedback">
-          <input type="password" name="password" class="form-control" placeholder="Password">
+          <input type="password" name="password_repeat" class="form-control" placeholder="Repetir nueva contraseña" value="<?= set_value('password_repeat') ?>" required>
           <span class="fa fa-slack form-control-feedback"></span>
         </div>
         <div class="row">
-          <div class="col-xs-8">
-            <div class="checkbox icheck">
-              <label>
-                <input type="checkbox" name="remember" checked="checked"> Remember Me
-              </label>
-            </div>
-          </div>
           <!-- /.col -->
-          <div class="col-xs-4">
-            <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
+          <div class="col-xs-12">
+            <button type="submit" class="btn btn-primary btn-block btn-flat">Recuperar contraseña</button>
           </div>
           <!-- /.col -->
         </div>
       </form>
-
-      <a href="/backend/actions/restore_password">I forgot my password</a><br>
-      <a href="register.html" class="text-center">Register a new membership</a>
-
+      
+      <br>
+      <a class="block text-center" href="/backend/login">Back to login page</a><br>
     </div>
     <!-- /.login-box-body -->
   </div>
@@ -83,17 +78,8 @@
 
 <?= get_js($js) ?>
 
-<!-- file script.js is mandatory, but must be loaded after all plugins to work properly -->
-<script src="/_assets/js/script.js"></script>
+  <!-- file script.js is mandatory, but must be loaded after all plugins to work properly -->
+   <script src="/_assets/js/script.js"></script>
 
-<script>
-  $(function () {
-    $('input').iCheck({
-      checkboxClass: 'icheckbox_square-blue',
-      radioClass: 'iradio_square-blue',
-      increaseArea: '20%' // optional
-    });
-  });
-</script>
 </body>
 </html>
