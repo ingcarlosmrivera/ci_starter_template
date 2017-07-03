@@ -20,10 +20,24 @@ class Auth extends Ion_auth
 		return $user;
 	}
 
-	public function get_users($group_id = NULL)
+	public function count_users()
 	{
-		$users = (isset($group_id)) ? $this->users($group_id)->result() : $this->users()->result();
+		return $this->auth_model->count_users();
+	}
 
+	public function count_groups()
+	{
+		return $this->auth_model->count_groups();
+	}
+
+	public function count_db_sessions()
+	{
+		return $this->auth_model->count_db_sessions();
+	}
+
+	public function get_users($group_id = NULL, $limit = 0, $offset = 0)
+	{
+		$users = (isset($group_id)) ? $this->limit($limit)->offset($offset)->users($group_id)->result() : $this->limit($limit)->offset($offset)->users()->result();
 		$temp = array();
 
 		foreach ($users as $user) {
@@ -41,44 +55,45 @@ class Auth extends Ion_auth
 
 	public function get_group($id = NULL)
 	{
-		$group = $this->group($id)->row();
-
-			$this->db->join($this->config->item('tables', 'ion_auth')['users_groups'], $this->config->item('tables', 'ion_auth')['users_groups'].'.group_id = ' . $this->config->item('tables', 'ion_auth')['groups'].'.id', 'left');
-			$this->db->where($this->config->item('tables', 'ion_auth')['users_groups'].'.group_id', $group->id);
-			$this->db->from($this->config->item('tables', 'ion_auth')['groups']);
-			$group->number_users = $this->db->count_all_results();
-		
-		return $group;
+		return $this->auth_model->get_group($id);
 	}
 
-	public function get_groups()
+	public function get_groups($limit = 0, $offset = 0)
 	{
-		$groups = $this->groups()->result();
-		$temp = array();
+		return $this->auth_model->get_groups($limit, $offset);
+	}
 
-		foreach ($groups as $group) {
-			$this->db->join($this->config->item('tables', 'ion_auth')['users_groups'], $this->config->item('tables', 'ion_auth')['users_groups'].'.group_id = ' . $this->config->item('tables', 'ion_auth')['groups'].'.id', 'left');
-			$this->db->where($this->config->item('tables', 'ion_auth')['users_groups'].'.group_id', $group->id);
-			$this->db->from($this->config->item('tables', 'ion_auth')['groups']);
-			$group->number_users = $this->db->count_all_results();
-			array_push($temp, $group);
-		}
+	public function get_permissions_list()
+	{
+		return $this->auth_model->get_permissions_list();
+	}
 
-		return $temp;
+	public function set_group_permissions($permissions, $group_id)
+	{
+		#delete current permissions
+		$this->auth_model->delete_group_permissions($group_id);
+
+		#set new permissions
+		$this->auth_model->set_group_permissions($permissions, $group_id);		
 	}
 
 
 	public function get_auth_messages()
 	{
+		$message = array();
 		if (!empty($this->errors())) {
-			$this->set_error_delimiters("<h4 class='no-margin text-center'>", "</h4>");
-			return $this->errors();
+			$this->set_error_delimiters("<h4 class='no-margin'><i class='fa fa-close'></i> ", "</h4>");
+			$message['message'] = $this->errors();
+			$message['alert_class'] = 'alert-danger';
 		}
 
 		if (!empty($this->messages())) {
-			$this->set_message_delimiters("<h4 class='no-margin text-center'>", "</h4>");
-			return $this->messages();
+			$this->set_message_delimiters("<h4 class='no-margin'><i class='fa fa-check'></i> ", "</h4>");
+			$message['message'] = $this->messages();
+			$message['alert_class'] = 'alert-success';
 		}
+
+		return $message;
 	}
 
 	public function forgotten_password($identity)    //changed $email to $identity
@@ -151,10 +166,27 @@ class Auth extends Ion_auth
 		}
 
 		return $response;
-
 	}
 
-	#this is for se in form_validation
+	#ACL check
+	public function check_permission($permission = NULL)
+	{
+		if (!is_null($permission)) {
+			$user = $this->get_user();
+			#check every group to see if permission is available
+			foreach ($user->groups as $group) {
+				if ($this->auth_model->group_has_permission($group->id, $permission)) {
+					return TRUE;
+				}
+			}
+			#if any match, return FALSE;
+			return FALSE;
+		} 
+
+		return FALSE;
+	}
+
+	#this is for use in form_validation
 	public function email_check_exclude($email)
 	{
 		$response = $this->auth_model->email_check_exclude($email);

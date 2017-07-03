@@ -6,12 +6,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        Lista de Usuarios
-        <!-- <small>Optional description</small> -->
+        Lista de Sesiones
+        <small>De más reciente a más antigua</small>
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-        <li><a href="#"><i class="fa fa-user"></i> Usuarios</a></li>
+        <li><a href="#"><i class="fa fa-users"></i> Usuarios</a></li>
         <li class="active">Lista de Usuarios</li>
       </ol>
     </section>
@@ -29,12 +29,11 @@
         <div class="col-xs-12">
           <div class="box">
             <div class="box-header with-border">
-              <h3 class="box-title"><i class="fa fa-users"></i> Lista de Usuarios</h3>
+              <h3 class="box-title"><i class="fa fa-users"></i> Lista de sesiones</h3>
             </div>
             <div class="box-body">
                 <div class="row">
                   <div class="col-xs-12 text-right">
-                    <a href="add" class="btn btn-success btn-flat margin-bottom-10"><i class="fa fa-user-plus"></i>  Registrar usuario</a>
                     <!-- <button type="button" class="btn btn-warning btn-flat margin-bottom-10"><i class="fa fa-file-excel-o"></i>  Exportar XLS</button> -->
                   </div>
                 </div>
@@ -42,39 +41,25 @@
               <table class="table table-bordered">
                 <tbody>
                   <tr>
-                    <th style="width: 10px">ID</th>
-                    <th>Username</th>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Creado</th>
-                    <th>Último Login</th>
-                    <th class="text-center">Status</th>
-                    <th>Grupos</th>
+                    <th>IP</th>
+                    <th>Timestamp</th>
+                    <th>Usuario</th>
+                    <th>Last check</th>
+                    <th>Navegador</th>
+                    <th class="text-center">S.O</th>
                     <th class="text-center"><i class="fa fa-cogs"></i></th>
                   </tr>
                   
-                  <?php foreach ($users as $user): ?>
+                  <?php foreach ($sessions as $session): ?>
                     <tr>
-                      <td><?= $user->id ?></td>
-                      <td><?= $user->username ?></td>
-                      <td><?= sprintf("%s %s", $user->first_name, $user->last_name) ?></td>
-                      <td><?= $user->email ?></td>
-                      <td><?= date_( $user->created_on) ?></td>
-                      <td><?= date_($user->last_login) ?></td>
-                      <td class="text-center"><?= ($user->active) ? "<a href='status/{$user->id}'><span class='fa fa-check text-success'></span></a>" : "<a href='status/{$user->id}'><span class='fa fa-close text-danger'></span></a>" ?></td>
-                      <td>
-                        <?php foreach ($user->groups as $group): ?>
-                          <a href="#" class="label label-flat label-<?= get_random_contextual_class() ?>" data-toggle="tooltip" title="<?= $group->description ?>"><?= strtoupper(substr($group->name, 0, 1)) ?></a>
-                        <?php endforeach ?>
-                      </td>
+                      <td><?= $session->ip_address ?></td>
+                      <td><?= date_($session->timestamp) ?></td>
+                      <td><?= (isset($session->userdata['email'])) ? $session->userdata['email'] : '';?></td>
+                      <td><?= (isset($session->userdata['last_check'])) ? $session->userdata['last_check'] : ''; ?></td>
+                      <td><?= (isset($session->userdata['browser'])) ? $session->userdata['browser'] : ''; ?></td>
+                      <td><?= (isset($session->userdata['platform'])) ? $session->userdata['platform'] : ''; ?></td>
                       <td class="text-center">
-                        <a href="edit/<?= $user->id ?>" class="btn  btn-primary btn-sm" data-toggle="tooltip" title="Ver/Editar usuario">
-                          <i class="glyphicon glyphicon-pencil"></i>
-                        </a>
-
-                        <button class="btn btn-info btn-sm restore-password" data-email="<?= $user->email ?>" data-toggle="tooltip" title="Restablecer contraseña">
-                          <i class="glyphicon glyphicon-envelope"></i>
-                        </button>
+                        <a href="session_manager/<?= $session->id ?>" class="btn btn-sm btn-danger btn-flat"><i class="fa fa-close"></i> Kick</a>
                       </td>
                     </tr>
                   <?php endforeach ?>

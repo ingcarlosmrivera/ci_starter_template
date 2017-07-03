@@ -117,8 +117,17 @@ function set_message($message = "", $alert_class = 'alert-success')
 	$CI =& get_instance();
 
 	$m = new stdClass();
+	#si es array, asume message para mensaje y alert-class para la clase, esto para utilizar mejor el auth->get_auth_messages()
+
+	if (isset($message['message']) && isset($message['alert_class'])) {
+		
+		$alert_class = $message['alert_class'];
+		$message = $message['message'];
+		
+	}
+
 	$m->alert_class = $alert_class;
-	$m->message = $message;
+	$m->message     = $message;
 
 	$CI->session->set_flashdata('message', $m);
 }

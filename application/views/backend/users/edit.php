@@ -11,7 +11,7 @@
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-        <li><a href="#"><i class="fa fa-users"></i> Usuarios</a></li>
+        <li><a href="#"><i class="fa fa-user"></i> Usuarios</a></li>
         <li class="active">Editar usuario</li>
       </ol>
 

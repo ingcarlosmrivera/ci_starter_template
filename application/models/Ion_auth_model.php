@@ -1831,11 +1831,14 @@ class Ion_auth_model extends CI_Model
 	 *
 	 * @return bool
 	 * @author jrmadsen67
+	 * Modified to store browser and OS data. -Carlos Rivera
 	 **/
 	public function set_session($user)
 	{
 
 		$this->trigger_events('pre_set_session');
+
+		$this->load->library('user_agent');
 
 		$session_data = array(
 		    'identity'             => $user->{$this->identity_column},
@@ -1844,6 +1847,9 @@ class Ion_auth_model extends CI_Model
 		    'user_id'              => $user->id, //everyone likes to overwrite id so we'll use user_id
 		    'old_last_login'       => $user->last_login,
 		    'last_check'           => time(),
+		    'browser'			   => $this->agent->browser(),
+		    'browser_version'	   => $this->agent->version(),
+		    'platform'			   => $this->agent->platform()
 		);
 
 		$this->session->set_userdata($session_data);

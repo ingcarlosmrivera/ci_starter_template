@@ -93,6 +93,19 @@
 
     <!-- file script.js is mandatory, but must be loaded after all plugins to work properly -->
     <script src="/_assets/js/script.js"></script>
+    <?php if (isset($sidebar_active)): ?>
+    <script>
+      var current = $('li[data-url="<?= $sidebar_active ?>"]');
+      current.addClass('active');
+      if (current.parent().hasClass('treeview-menu')) {
+        current.parent().addClass('menu-open')
+      }
+
+      if (current.parent().parent().hasClass('treeview')) {
+        current.parent().parent().addClass('active')
+      }
+    </script>
+    <?php endif ?>
     <!-- Optionally, you can add Slimscroll and FastClick plugins.
          Both of these plugins are recommended to enhance the
          user experience. Slimscroll is required when using the

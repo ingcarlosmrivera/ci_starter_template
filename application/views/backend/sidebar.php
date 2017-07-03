@@ -32,7 +32,7 @@
     <ul class="sidebar-menu">
       <li class="header">MAIN MENU</li>
       <!-- Optionally, you can add icons to the links -->
-      <li class="active">
+      <li>
         <a href="#">
           <i class="fa fa-bar-chart"></i> <span>Transacciones</span>
         </a>
@@ -51,19 +51,28 @@
       </li>
 
       <li class="treeview">
-        <a href="#"><i class="fa fa-users"></i> <span>Usuarios</span>
+        <a href="#"><i class="fa fa-users"></i> <span>Grupos y Usuarios</span>
           <span class="pull-right-container">
             <i class="fa fa-angle-left pull-right"></i>
           </span>
         </a>
         <ul class="treeview-menu">
-          <li><a href="/backend/users/list">Gestionar Usuarios</a></li>
-          <li><a href="/backend/users/groups">Gestionar Grupos</a></li>
-          <li><a href="#">Enviar Recarga</a></li>
+          <li data-url="users/">
+            <a href="/backend/users/list">
+              <i class="fa fa-circle-o"></i> 
+              Gestionar Usuarios
+            </a>
+          </li>
+          <li data-url="groups/">
+            <a href="/backend/groups/list">
+              <i class="fa fa-circle-o"></i> 
+              Gestionar Grupos
+            </a>
+          </li>
         </ul>
       </li>
 
-      <li class="active"><a href="#"><i class="fa fa-cogs"></i> <span>Configuración</span></a></li>
+      <li><a href="#"><i class="fa fa-cogs"></i> <span>Configuración</span></a></li>
     </ul>
     <!-- /.sidebar-menu -->
   </section>

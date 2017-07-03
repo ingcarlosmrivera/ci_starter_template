@@ -1,18 +1,21 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Welcome extends CI_Controller {
+class Backend_model extends CI_Model {
 
 	public function __construct()
 	{
 		parent::__construct();
+		
 	}
 
-	public function index()
+	public function get_all_user_sessions($limit = 0, $offset = 0)
 	{
+		$this->db->limit($limit, $offset);
 		$this->db->order_by('timestamp', 'desc');
         $query = $this->db->get("ci_sessions");
+
         $rows = array();
-        echo "<pre>";
+
         foreach ($query->result() as $row)
         {   
             $row->data = explode(';', $row->data);
@@ -26,12 +29,16 @@ class Welcome extends CI_Controller {
             }
             unset($row->data);
             array_push($rows, $row);
-            
         } 
-        var_dump($rows);
+        return $rows;
+	}
+
+	public function kick_session($id)
+	{
+		return $this->db->delete('ci_sessions', array('id' => $id));
 	}
 
 }
 
-/* End of file Welcome.php */
-/* Location: ./application/controllers/Welcome.php */
+/* End of file Backend_model.php */
+/* Location: ./application/models/Backend_model.php */

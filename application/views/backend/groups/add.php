@@ -35,6 +35,12 @@
               <h3 class="box-title"><i class="fa fa-user-plus"></i> Registrar Grupo</h3>
             </div>
             <div class="box-body">
+              <div class="callout callout-info">
+                <h4>Información de permisos</h4>
+
+                <p>La limitación de acciones basadas en roles de grupo NO APLICA al grupo de administradores del sistema. Para el resto de grupos, es necesario agregar al menos el permiso 'backend_login', de lo contrario, no podrá iniciar sesión en el panel administrativo.</p>
+                <p>El grupo de administradores SIEMPRE tendrá accesso a cualquier acción del backend, sin importar si se asigna o no el permiso al editar el grupo.</p>
+              </div>
               <!-- validation errors, if case that client side validation fails -->
               <?php if (validation_errors()): ?>
                 <ul class="list list-unstyled margin-bottom-10">
@@ -56,6 +62,17 @@
                     <div class="form-group">
                       <label for="description">Descripción</label>
                       <input type="text" class="form-control" id="description" name="description" placeholder="Descripción del grupo" value="<?= set_value('description') ?>">
+                    </div>
+                  </div>
+
+                  <div class="col-xs-12">
+                    <div class="form-group">
+                      <label for="description">Permisos de grupo</label>
+                      <select name="permissions[]" id="permissions" class="form-control" label="Escriba y seleccione los permisos" multiple="multiple">
+                        <?php foreach ($permissions as $permission): ?>
+                          <option value="<?= $permission->id ?>"><?= $permission->permission ?></option>
+                        <?php endforeach ?>
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -92,7 +109,28 @@
         description: {
           required: true, 
           maxlength: 100
+        },
+        'permissions[]': {
+          required: true
         }
       }
+    });
+
+    $('#permissions').select2({
+
+      initSelection : function (element, callback) {
+        
+        var data = [{id: '1', text: 'backend_login'}];//Array
+        $('#permissions').val(data)
+
+        callback(data); //Fill'em
+
+        // select on select element
+        $.each(data, function(i,e){
+            $("#permissions option[value='" + e.id + "']").prop("selected", true);
+        });
+      }
+    }).on('change', function(e) {
+      $('#form_add_group').valid();
     });
 </script>

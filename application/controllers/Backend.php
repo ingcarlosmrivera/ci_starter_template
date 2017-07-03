@@ -7,6 +7,8 @@ class Backend extends CI_Controller {
 	public function __construct()
 	{
 		parent::__construct();
+		$this->load->model('backend_model');
+
 		$this->data['js'] = array();
 		$this->data['css'] = array();
 	}
@@ -42,11 +44,13 @@ class Backend extends CI_Controller {
 				$password = $this->input->post('password', TRUE);
 				$remember = ($this->input->post('remember', TRUE)) ? $this->input->post('remember', TRUE) : FALSE;
 
+				
 				if ($this->auth->login($email, $password, $remember)) {
-					set_message($this->auth->get_auth_messages(), 'alert-success');
+					set_message($this->auth->get_auth_messages());
 					redirect('/backend/dashboard','refresh');
 				} else {
-					set_message($this->auth->get_auth_messages(), 'alert-danger');
+					set_message($this->auth->get_auth_messages());
+					redirect('/backend/login','refresh');
 				}
 			}
 		}
@@ -91,13 +95,8 @@ class Backend extends CI_Controller {
 						}
 
 						#if not ajax send and redirect
-						if ($this->auth->forgotten_password($email)) {
-							set_message($this->auth->get_auth_messages(), 'alert-success');
-						}
-						else {
-							set_message($this->auth->get_auth_messages(), 'alert-danger');
-						}
-
+						$this->auth->forgotten_password($email);
+						set_message($this->auth->get_auth_messages());
 						redirect('/backend/actions/restore_password', 'refresh');							
 					}
 						
@@ -121,18 +120,17 @@ class Backend extends CI_Controller {
 
 					if ($this->form_validation->run() !== FALSE) {
 						$email = $this->data['user']->email;
+						set_message($this->auth->get_auth_messages());
 
 						if ($this->auth->reset_password($email, $this->input->post('password'))) {
-							set_message($this->auth->get_auth_messages(), 'alert-success');
 							redirect("backend/login", 'refresh');
 						} else {
-							set_message($this->auth->get_auth_messages(), 'alert-danger');
 							redirect("backend/actions/restore_password", 'refresh');
 						}
 					}
 				} else {
 					// if the code is invalid then send them back to the forgot password page
-					set_message($this->auth->get_auth_messages(), 'alert-danger');
+					set_message($this->auth->get_auth_messages());
 					redirect("backend/actions/restore_password", 'refresh');
 				}
 
@@ -145,12 +143,30 @@ class Backend extends CI_Controller {
 		}
 	}
 
-	public function users($action = "list", $param1 = NULL)
+	public function users($action = "list", $param1 = NULL, $param2 = NULL)
 	{
 		$this->check_session();
+		$this->data['sidebar_active'] = 'users/';
+
 		switch ($action) {
 			case 'list':
-				$this->data['users'] = $this->auth->get_users();
+				// if (!$this->auth->check_permission('list_users')) {
+				// 	show_404();
+				// }
+
+				$this->load->library('pagination'); 
+				#cargar variables iniciales de paginación
+				$per_page              = 10; //Número de registros mostrados por páginas
+				$current_page          = $this->uri->segment(4);
+				$this->data['users']   = $this->auth->get_users(NULL, $per_page, $current_page);
+				
+				$config['base_url']    = base_url().'backend/users/list/';
+				$config['total_rows']  = $this->auth->count_users();//calcula el número de filas  
+				$config['per_page']    = $per_page; //Número de registros mostrados por páginas
+				$config['num_links']   = 2; //Número de links mostrados en la paginación
+				$config["uri_segment"] = 4;//el segmento de la paginación
+				$this->pagination->initialize($config); //inicializamos la paginación		
+		        
 				$this->load->view('backend/users/list', $this->data);
 				break;
 
@@ -181,7 +197,7 @@ class Backend extends CI_Controller {
 			            #at this point, if register is success or not we have to set message and redirect. So...
 			            $this->auth->register($email, $password, $email, $additional_data, $groups);
 			            #set message and redirect
-			            set_message($this->auth->get_auth_messages(), 'alert-success');
+			            set_message($this->auth->get_auth_messages());
 			            redirect("/backend/users/add", 'refresh');
 					}
 				}
@@ -276,26 +292,40 @@ class Backend extends CI_Controller {
 
 				$user = $this->auth->get_user($param1);
 				($user->active == 1) ? $this->auth->deactivate($param1) : $this->auth->activate($param1);
-				set_message($this->auth->get_auth_messages(), 'alert-success');
+				set_message($this->auth->get_auth_messages());
 				$this->load->library('user_agent');
 				redirect($this->agent->referrer(),'refresh');
-				reak;
+				break;
 
 			case 'delete':
-				#only admins can delete
-				if (!$this->auth->is_admin()) {
-					set_message('Solo administradores pueden borrar usuarios', 'alert-danger');
-					redirect("/backend/users/edit/$param1",'refresh');
+				#process delete
+				$result = $this->auth->delete_user($param1);
+				set_message($this->auth->get_auth_messages());
+
+				($result) ? redirect('/backend/users/list','refresh') : redirect("/backend/users/edit/$param1",'refresh');
+				break;
+
+			case 'session_manager':
+				if (!is_null($param2)) {
+					$this->backend_model->kick_session($param2);
+					set_message('Session kicked!', 'alert-success');
+					redirect('/backend/users/session_manager','refresh');
 				}
 
-				#process delete
-				if ($this->auth->delete_user($param1)) {
-					set_message($this->auth->get_auth_messages(), 'alert-success');
-					redirect('/backend/users/list','refresh');
-				} else {
-					set_message($this->auth->get_auth_messages(), 'alert-danger');
-					redirect("/backend/users/edit/$param1",'refresh');
-				}
+				$this->load->library('pagination'); 
+				#cargar variables iniciales de paginación
+				$per_page               = 10; //Número de registros mostrados por páginas
+				$current_page           = $this->uri->segment(4);
+				$this->data['sessions'] = $this->backend_model->get_all_user_sessions($per_page, $current_page);
+				
+				$config['base_url']     = base_url().'backend/users/session_manager/';
+				$config['total_rows']   = $this->auth->count_db_sessions();//calcula el número de filas  
+				$config['per_page']     = $per_page; //Número de registros mostrados por páginas
+				$config['num_links']    = 2; //Número de links mostrados en la paginación
+				$config["uri_segment"]  = 4;//el segmento de la paginación
+				$this->pagination->initialize($config); //inicializamos la paginación		
+		        
+				$this->load->view('backend/users/session_manager', $this->data);
 				break;
 				
 			
@@ -308,9 +338,23 @@ class Backend extends CI_Controller {
 	public function groups($action = "list", $param1 = NULL)
 	{
 		$this->check_session();
+		$this->data['sidebar_active'] = 'groups/';
+
 		switch ($action) {
 			case 'list':
-				$this->data['groups'] = $this->auth->get_groups();
+				$this->load->library('pagination'); 
+				#cargar variables iniciales de paginación
+				$per_page              = 10; //Número de registros mostrados por páginas
+				$current_page          = $this->uri->segment(4);
+				$this->data['groups']  = $this->auth->get_groups($per_page, $current_page);
+				
+				$config['base_url']    = base_url().'backend/groups/list/';
+				$config['total_rows']  = $this->auth->count_groups();//calcula el número de filas  
+				$config['per_page']    = $per_page; //Número de registros mostrados por páginas
+				$config['num_links']   = 2; //Número de links mostrados en la paginación
+				$config["uri_segment"] = 4;//el segmento de la paginación
+				$this->pagination->initialize($config); //inicializamos la paginación		
+		        
 				$this->load->view('backend/groups/list', $this->data);
 				break;
 
@@ -319,19 +363,24 @@ class Backend extends CI_Controller {
 				if ($this->input->post()) {
 					$this->form_validation->set_rules('name', 'Nombre', "required|trim|max_length[20]");
 					$this->form_validation->set_rules('description', 'Descripción', "required|trim|max_length[100]");
+					$this->form_validation->set_rules('permissions[]', 'Permisos', "required|trim");
 
 					if ($this->form_validation->run() !== FALSE) {
 						$name = $this->input->post('name', TRUE);
 						$description = $this->input->post('description', TRUE);
 			            #at this point, if register is success or not we have to set message and redirect. So...
-			            $this->auth->create_group($name, $description);
+			            $group_id = $this->auth->create_group($name, $description);
+			            #set permissions
+						$this->auth->set_group_permissions($this->input->post('permissions', TRUE), $group_id);
 			            #set message and redirect
-			            set_message($this->auth->get_auth_messages(), 'alert-success');
+			            set_message($this->auth->get_auth_messages());
 			            redirect("/backend/groups/add", 'refresh');
 					}
 				}
 
-				$this->data['js'] = array('jquery_validate');
+				$this->data['js'] = array('jquery_validate', 'select2');
+				$this->data['css'] = array('select2');
+				$this->data['permissions'] = $this->auth->get_permissions_list();
 				$this->load->view('backend/groups/add', $this->data);
 				break;
 
@@ -346,6 +395,7 @@ class Backend extends CI_Controller {
 				if ($this->input->post()) {
 					$this->form_validation->set_rules('name', 'Nombre', "required|trim|max_length[20]");
 					$this->form_validation->set_rules('description', 'Descripción', "required|trim|max_length[100]");
+					$this->form_validation->set_rules('permissions[]', 'Permisos', "required|trim");
 
 					if ($this->form_validation->run() !== FALSE) {
 						$group_id = $this->input->post('group_id', TRUE);
@@ -354,38 +404,39 @@ class Backend extends CI_Controller {
 
 						// check to see if we are updating the user
 						$this->auth->update_group($group_id, $name, $description);
-						set_message($this->auth->get_auth_messages(), 'alert-success');
+						#set permissions
+						$this->auth->set_group_permissions($this->input->post('permissions', TRUE), $group_id);
+
+						set_message($this->auth->get_auth_messages());
 						redirect("/backend/groups/edit/{$group_id}", 'refresh');
 
 					}
 				}
 
-				$this->data['js'] = array('jquery_validate');
+				$this->data['js'] = array('jquery_validate', 'select2');
+				$this->data['css'] = array('select2');
 				$this->data['group'] = $this->auth->get_group($param1);
+				$this->data['permissions'] = $this->auth->get_permissions_list();
 				$this->load->view('backend/groups/edit', $this->data);
 				break;
 
 			case 'delete':
-				#only admins can delete
-				if (!$this->auth->is_admin()) {
-					set_message('Solo administradores pueden borrar grupos', 'alert-danger');
-					redirect("/backend/groups/edit/$param1",'refresh');
-				}
-
 				#process delete
-				if ($this->auth->delete_group($param1)) {
-					set_message($this->auth->get_auth_messages(), 'alert-success');
-					redirect('/backend/groups/list','refresh');
-				} else {
-					set_message($this->auth->get_auth_messages(), 'alert-danger');
-					redirect("/backend/groups/edit/$param1",'refresh');
-				}
+				$result = $this->auth->delete_group($param1);
+				set_message($this->auth->get_auth_messages());
+
+				($result) ? redirect('/backend/groups/list','refresh') : redirect("/backend/groups/edit/$param1",'refresh');
 				break;				
 			
 			default:
 				# code...
 				break;
 		}
+	}
+
+	public function session_manager()
+	{
+		
 	}
 
 	public function check_session()

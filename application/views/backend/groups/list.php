@@ -11,7 +11,7 @@
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-        <li><a href="#"><i class="fa fa-groups"></i> Grupos</a></li>
+        <li><a href="#"><i class="fa fa-group"></i> Grupos</a></li>
         <li class="active">Lista de Grupos</li>
       </ol>
     </section>
@@ -35,7 +35,7 @@
                 <div class="row">
                   <div class="col-xs-12 text-right">
                     <a href="add" class="btn btn-success btn-flat margin-bottom-10"><i class="fa fa-user-plus"></i>  Registrar grupo</a>
-                    <button type="button" class="btn btn-warning btn-flat margin-bottom-10"><i class="fa fa-file-excel-o"></i>  Exportar XLS</button>
+                    <!-- <button type="button" class="btn btn-warning btn-flat margin-bottom-10"><i class="fa fa-file-excel-o"></i>  Exportar XLS</button> -->
                   </div>
                 </div>
 
@@ -45,6 +45,7 @@
                     <th style="width: 10px">ID</th>
                     <th>Nombre del grupo</th>
                     <th>Descripción</th>
+                    <th>Permisos</th>
                     <th># de usuarios</th>
                     <th class="text-center"><i class="fa fa-cogs"></i></th>
                   </tr>
@@ -54,6 +55,15 @@
                       <td><?= $group->id ?></td>
                       <td><?= $group->name ?></td>
                       <td><?= $group->description ?></td>
+                      <td>
+                        <?php if (count($group->permissions > 0)): ?>
+                          <?php foreach ($group->permissions as $permission): ?>
+                            <label for="" class="label label-<?= get_random_contextual_class() ?>" data-toggle="tooltip" title="<?= $permission->description ?>"><?= $permission->permission ?></label>
+                          <?php endforeach ?>
+                        <?php else: ?>
+                          -
+                        <?php endif ?>
+                      </td>
                       <td><?= $group->number_users ?></td>
                       <td class="text-center">
                         <a href="edit/<?= $group->id ?>" class="btn  btn-primary btn-sm" data-toggle="tooltip" title="Ver/Editar grupo">
@@ -67,13 +77,7 @@
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
-              <ul class="pagination pagination-sm no-margin pull-right">
-                <li><a href="#">«</a></li>
-                <li><a href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">»</a></li>
-              </ul>
+              <?php echo $this->pagination->create_links() ?>
             </div>
           </div>
           <!-- /.box -->
