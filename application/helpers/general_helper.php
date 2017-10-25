@@ -1,5 +1,76 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+#manejador de excepciones
+// set_error_handler('manejador_errores');
+
+// function manejador_errores($a, $b, $c, $d)
+// {
+// 	$CI =& get_instance();
+
+// 	$message  = "Ha ocurrido un error. <br>";
+// 	$message .= "Nivel: {$a} <br>";
+// 	$message .= "Archivo: {$c} <br>";
+// 	$message .= "Línea: {$d} <br>";
+// 	$message .= "<b>Mensaje: {$b} </b><br>";
+
+// 	$message .= "<br><br>";
+
+// 	$sesion = json_encode($CI->session->all_userdata());
+// 	$message .= "Dump: {$sesion} <br>";
+
+// 	$message .= "<a href='/clientes/logout'>Click aqui para entrar de nuevo</a>";
+
+// 	$CI->load->library('email');
+	
+// 	$CI->email->from('errorhandler@consultar-rrhh.com', 'Error Handler');
+// 	$CI->email->to('carlos.rivera@consultar-rrhh.com');
+	
+// 	$CI->email->subject('New system error');
+// 	$CI->email->message($message);
+	
+// 	$CI->email->send();
+
+// 	die($message);
+	
+// }
+
+function pedidos_to_excel($result, $filename='exceloutput')
+{
+	$headers = ''; // just creating the var for field headers to append to below
+	$setted= FALSE;
+	$data = ''; // just creating the var for field data to append to below
+
+	foreach ($result as $row) {
+		#recorrer cada fila
+		$line = '';
+		foreach ($row as $k => $v) {
+			if (!$setted) {
+				$headers .= $k . "\t";
+			}
+
+			if ($k == 'creado') {
+				$v = _date($v);
+			}
+
+			if ((!isset($v)) OR ($v == "")) {
+                 $v = "\t";
+            } else {
+                 $v = str_replace('"', '""', $v);
+                 $v = '"' . $v . '"' . "\t";
+            }
+            $line .= $v;
+		}
+		$setted = TRUE;
+		$data .= trim($line)."\n";
+	}
+
+	$filename = "file_" . date('Ymdhis') . ".xls";
+	$data = str_replace("\r","",$data);
+	header("Content-type: application/x-msdownload");
+	header("Content-Disposition: attachment; filename=$filename");
+	echo mb_convert_encoding("$headers\n$data",'utf-16','utf-8');
+}
+
 function get_site_title()
 {
 	$CI =& get_instance();
@@ -19,6 +90,13 @@ function get_user()
 	$CI =& get_instance();
 
 	return $CI->auth->get_user();
+}
+
+function is_admin()
+{
+	$CI =& get_instance();
+
+	return $CI->auth->is_admin();
 }
 
 function get_random_contextual_class()
@@ -152,3 +230,8 @@ function date_($date)
 	$CI =& get_instance();
 	return date($CI->config->item('date_format'), $date);
 }
+
+function _date($date)
+  {
+    return date ("d/m/Y",strtotime($date));
+  }

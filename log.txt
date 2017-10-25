@@ -1,0 +1,2 @@
+[16-Aug-2017 14:57:27 America/Caracas] PHP Parse error:  syntax error, unexpected ';' in /home/u413406418/public_html/application/controllers/Backend.php on line 728
+[16-Aug-2017 14:57:58 America/Caracas] PHP Parse error:  syntax error, unexpected ';' in /home/u413406418/public_html/application/controllers/Backend.php on line 730

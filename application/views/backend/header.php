@@ -26,11 +26,11 @@
     <header class="main-header">
 
       <!-- Logo -->
-      <a href="index2.html" class="logo">
+      <a href="#" class="logo">
         <!-- mini logo for sidebar mini 50x50 pixels -->
-        <span class="logo-mini"><b>S</b>tarter</span>
+        <span class="logo-mini"><b>H&S</b></span>
         <!-- logo for regular state and mobile devices -->
-        <span class="logo-lg"><b>Starter</b></span>
+        <span class="logo-lg"><img src="/_assets/img/minilogo.png" alt="" class="img img-responsive" height="50px" style="height: 47px;margin: 0 auto"></span>
       </a>
 
       <!-- Header Navbar -->
@@ -66,7 +66,7 @@
                 <!-- Menu Footer-->
                 <li class="user-footer">
                   <div class="pull-right">
-                    <a href="#" class="btn btn-block btn-danger btn-flat">Sign out</a>
+                    <a href="/backend/logout" class="btn btn-block btn-danger btn-flat">Sign out</a>
                   </div>
                 </li>
               </ul>

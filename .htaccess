@@ -2,4 +2,11 @@ RewriteEngine on
     RewriteCond $1 !^(index\.php|assets|img|css|js|robots\.txt|favicon\.ico)
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ ./index.php/$1 [L,QSA]
+    RewriteRule ^(.*)$ ./index.php?/$1 [L,QSA]
+
+# log PHP errors to a file
+php_flag log_errors on
+php_value error_reporting 32767
+php_value error_log "/home/u413406418/.logs/log.txt"
+# End log PHP errors to a file
+

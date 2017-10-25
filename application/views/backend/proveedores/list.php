@@ -1,0 +1,142 @@
+<?php require(__DIR__.'/../header.php') ?>
+<?php require(__DIR__.'/../sidebar.php') ?>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Lista de Proveedores
+        <!-- <small>Optional description</small> -->
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+        <li><a href="#"><i class="fa fa-user"></i> Proveedores</a></li>
+        <li class="active">Lista de Proveedores</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- alert message if defined -->
+      <?php if ($this->session->flashdata('message')): ?>
+        <div class="alert <?= $this->session->flashdata('message')->alert_class ?>">
+          <h4 class="no-margin"><?= $this->session->flashdata('message')->message ?></h4>
+        </div>
+      <?php endif ?>
+
+      <div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header with-border">
+              <h3 class="box-title"><i class="fa fa-users"></i> Lista de Proveedores</h3>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                  <form class="form" name="form_search" id="form_search" method="post">
+                    <div class="form-group col-sm-3">
+                      <label>Buscar por:</label>
+                      <select class="form-control" name="buscar_por" id="buscar_por">
+                        <option value="razon" <?= ($buscar_por == 'razon') ? 'selected' : '' ?>>Razón Social</option>
+                        <option value="email" <?= ($buscar_por == 'email') ? 'selected' : '' ?>>Email</option>
+                        // <!-- <option value="localidad" <?= ($buscar_por == 'localidad') ? 'selected' : '' ?>>Localidad</option> -->
+                      </select>
+                    </div>
+
+                    <div class="form-group col-sm-4" >
+                      <label for="">Escribe búsqueda</label>
+                      <div class="input-group">
+                        <input type="text" name="text" id="text" class="form-control pull-right" placeholder="Buscar" value="<?= $busqueda ?>">
+                        <span class="input-group-addon pointer">
+                          <span class="fa fa-search "></span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="form-group col-sm-2">
+                      <label class="block">&nbsp;</label>
+                      <button type="submit" class="btn btn-primary btn-flat">
+                        <i class="fa fa-search"></i> 
+                        Buscar
+                      </button>
+                    </div>
+
+                    <div class="col-sm-3 text-right">
+                      <label class="block">&nbsp;</label>
+                      <a href="/backend/proveedores/add" class="btn btn-success btn-flat margin-bottom-10"><i class="fa fa-user-plus"></i>  Registrar proveedor</a>
+                      <!-- <button type="button" class="btn btn-warning btn-flat margin-bottom-10"><i class="fa fa-file-excel-o"></i>  Exportar XLS</button> -->
+                    </div>
+                  </form> 
+
+                  <div class="col-xs-12">
+                    <div class="table-responsive">
+                      <table class="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Razón Social</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Provincia</th>
+                            <th>Localidad</th>
+                            <th class="text-center"><i class="fa fa-cogs"></i></th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+
+                          <?php if ($proveedores): ?>
+                            <?php foreach ($proveedores as $p): ?>
+                              <tr class="tr_proveedor" style="cursor: pointer" data-proveedor="<?= $p->idproveedor?>">
+                                <td><?php echo $p->idproveedor ?></td>
+                                <td><?php echo $p->razon ?></td>
+                                <td><?php echo $p->email ?></td>
+                                <td><?php echo $p->telefono ?></td>
+                                <td><?php echo $p->provincia ?></td>
+                                <td><?php echo $p->localidad ?></td>
+                                <td class="text-center">
+                                  <a href="/backend/proveedores/view/<?= $p->idproveedor ?>" class="btn btn-info btn-sm btn-flat">
+                                    <i class="fa fa-eye"></i> 
+                                    Ver proveedor 
+                                  </a>
+                                </td>
+                              </tr>
+                            <?php endforeach; ?>
+                          <?php else: ?>
+                            <tr>
+                              <td  colspan="7">
+                                <h5 class="text-center">
+                                  No se encontraron resultados
+                                </h5>
+                              </td>
+
+                            </tr>
+                          <?php endif; ?>
+
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>                       
+                </div>
+                    
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer clearfix">
+              <?php echo $this->pagination->create_links() ?>
+            </div>
+          </div>
+          <!-- /.box -->
+        </div>
+      </div>
+
+    </section>
+    <!-- /.content -->
+
+  </div>
+  <!-- /.content-wrapper -->
+
+<?php require(__DIR__.'/../footer.php') ?>
+
+<script>
+  
+</script>

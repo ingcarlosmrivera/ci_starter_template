@@ -73,6 +73,22 @@ class Auth_model extends CI_Model {
 		return $this->db->order_by('position', 'ASC')->order_by('permission', 'ASC')->get('permissions')->result();
 	}
 
+	public function delete_group_permissions($group_id)
+	{
+		return $this->db->delete('group_permissions', array('group_id' => $group_id));
+	}
+
+	public function set_group_permissions($permissions, $group_id)
+	{
+		if (is_array($permissions)) {
+			foreach ($permissions as $permission) {
+				$this->db->insert('group_permissions', array('group_id' => $group_id, 'permission_id' => $permission));
+			}
+		} else {
+			$this->db->insert('group_permissions', array('group_id' => $group_id, 'permission_id' => $permissions));
+		}
+	}
+
 	public function email_check_exclude($email)
 	{
 		$query = $this->db->get_where($this->config->item('tables', 'ion_auth')['users'], array('email' => $email), 1);

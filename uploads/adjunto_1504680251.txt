@@ -1,0 +1,199 @@
+SELECT CONCAT( first_name,  ' ', last_name ) , email  FROM `accounts`
+where status = '0'
+and segmento in ('cuba', '0', '-', '', ' ')
+or segmento is null
+
+SELECT concat('+', country_code, telephone_1) FROM `accounts`
+where status = '0'
+and segmento in ('cuba', '0', '-', '', ' ')
+and country in ('Estados Unidos', 'Canada')
+AND telephone_1 NOT 
+IN (
+'',  '0',  '+',  ' '
+)
+
+
+SELECT count(*), date_format(date_trans, '%Y-%m') as DATE, retail, recarga_type as tipo
+WHERE recarga_type = 'nauta'
+AND topup_status !=  'cancelled'
+and date_trans > '2016-06-01 00:00:00'
+and retail in (10, 11, 15, 16.5, 20, 22) 
+group by retail, date
+order by date desc, retail asc
+
+
+
+
+SELECT CONCAT( first_name,  ' ', last_name ) , email
+FROM  `accounts` 
+WHERE id NOT 
+IN (
+
+SELECT id_account
+FROM save_transaction
+WHERE recarga_type =  'Funds'
+)
+AND status = '0'
+
+-----------------------------
+
+SELECT CONCAT(  '+', country_code, telephone_1 ) AS phone
+FROM  `accounts` 
+WHERE id NOT 
+IN (
+
+SELECT id_account
+FROM save_transaction
+WHERE recarga_type =  'Funds'
+)
+AND status = '0'
+AND telephone_1 NOT 
+IN (
+'',  '0',  '+',  ' '
+)
+and country in ('Estados Unidos', 'Canada')
+--------------------------------
+
+SELECT concat('+', country_code, telephone_1)FROM `accounts` where id not in(select id_account from 
+
+save_transaction where recarga_type = 'Funds') 
+and country in ('Estados Unidos', 'Puerto Rico', 'Canada')
+and segmento in ('Cuba', '0')
+
+SELECT count(*) as a, country from accounts group by country order by a desc
+
+SELECT CONCAT( first_name,  ' ', last_name ) , email
+FROM  `accounts` 
+WHERE segmento
+IN (
+'Cuba',  '0',  ''
+)
+AND (
+registered_language IS NULL 
+OR registered_language =  'es'
+)
+
+
+SELECT transaction_id, date_trans, cc_num, recarga_type, amount_payed
+FROM  `save_transaction` 
+WHERE date_trans LIKE  '2016-09%'
+AND recarga_type
+IN (
+'mobile',  'nauta'
+)
+AND success_status !=  'declined'
+ORDER BY cc_num ASC
+
+
+consumos del dia
+SELECT distinct(a.id), a.first_name, a.last_name, count(*) as consumos, SUM(amount_payed) as consumido FROM accounts a 
+join save_transaction st on a.id = id_account
+where creation like '2016-11-09%'
+and success_status like 'succe%'
+group by a.id
+
+
+
+lista especial de fidel
+SELECT id, CONCAT(first_name, ' ', last_name) as name, email, password, CONCAT(  '+', country_code, telephone_1 ) AS phone, country, segmento, (select 'SI' from safe_list where id_account = a.id) as validated
+FROM  accounts a
+WHERE id IN (
+	SELECT id_account
+	FROM save_transaction
+	WHERE recarga_type =  'Mobile'
+)
+AND id NOT 
+IN (
+
+	SELECT id_account
+	FROM save_transaction
+	WHERE recarga_type =  'Mobile'
+	AND date_trans > '2016-09-30 23:59:59'
+)
+AND telephone_1 NOT 
+IN (
+'',  '0',  '+',  ' '
+)
+AND status = '0'
+
+
+
+---------------------------------------------------------------------
+SELECT 
+	a.id, CONCAT(a.first_name, ' ', a.last_name) as name, 
+	a.email, a.password, 
+	CONCAT(  '+', a.country_code, a.telephone_1 ) AS phone, 
+	a.country, a.segmento, 
+	IF ((select count(*) from save_transaction st1 WHERE st1.recarga_type = 'Nauta' and st1.id_account = a.id), 'Si', 'No') as Nauta, 
+	IF ((select count(*) from save_transaction st2 WHERE st2.recarga_type = 'Mobile' and st2.id_account = a.id), 'Si', 'No') as Mobile,
+	IF ((select count(*) from save_transaction st3 WHERE st3.recarga_type = 'Funds' and st3.id_account = a.id), 'Si', 'No') as Funds, 
+	IF ((select count(*) from safe_list sl WHERE sl.id_account = a.id), 'Si', 'No') as validated
+FROM  accounts a
+WHERE a.id IN (
+	SELECT 
+		id_account FROM save_transaction
+	WHERE 
+		recarga_type = 'Nauta' OR recarga_type = 'Funds'
+)
+AND a.id NOT IN (
+	SELECT 
+		id_account FROM save_transaction
+	WHERE 
+		recarga_type = 'Mobile'
+)
+AND 
+	a.telephone_1 NOT IN 
+(
+	'',  '0',  '+',  ' '
+)
+AND 
+	a.status = '0'
+AND
+	a.segmento in
+(
+	'Cuba',  '0',  ''
+)
+
+
+
+
+
+
+
+SELECT *, count(*),sum(amount_payed) FROM `save_transaction` 
+where date_trans like '2016-12%'
+and success_status like 'succe%'
+and recarga_type != 'SMS'
+and cc_num not like '%paypal%'
+and transaction_id not in ()
+group by recarga_type
+
+
+SELECT 
+	a.id, CONCAT('http://www.hablax.com/administration/customerDetails/index/', a.id) as url, 
+	a.id, CONCAT(a.first_name, ' ', a.last_name) as name, 
+	a.email, a.password, 
+	CONCAT(  '+', a.country_code, a.telephone_1 ) AS phone, 
+	a.country, a.segmento, 
+	IF ((select count(*) from save_transaction st1 WHERE st1.recarga_type = 'Nauta' and st1.id_account = a.id), 'Si', 'No') as Nauta, 
+	IF ((select count(*) from save_transaction st2 WHERE st2.recarga_type = 'Mobile' and st2.id_account = a.id), 'Si', 'No') as Mobile,
+	IF ((select count(*) from save_transaction st3 WHERE st3.recarga_type = 'Funds' and st3.id_account = a.id), 'Si', 'No') as Funds, 
+	IF ((select count(*) from safe_list sl WHERE sl.id_account = a.id), 'Si', 'No') as validated
+FROM  accounts a
+WHERE a.id IN (
+	SELECT 
+		id_account FROM save_transaction
+	WHERE 
+		recarga_type = 'Mobile'
+)
+AND
+	a.id NOT IN (
+	SELECT 
+		distinct(id_account) FROM save_transaction
+	WHERE
+		date_trans > '2016-12-01'
+	AND
+		recarga_type = 'mobile'
+)
+AND 
+	a.status = '0'

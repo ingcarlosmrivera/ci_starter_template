@@ -1,5 +1,22 @@
 /*own styles and classes*/
+.cotizacion {
+	margin-right: 15px
+}
+ div.tolltip-inner {
+    max-width: 550px;
+}
 
+div.tooltip
+{
+    word-wrap: break-word;
+}
+.pointer {
+	cursor: pointer;
+}
+.img-center {
+	display: block;
+	margin: 0 auto;
+}
 .select2-selection.has-error {
     border-color:red !important;
     color:red !important;

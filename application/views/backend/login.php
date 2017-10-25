@@ -73,8 +73,8 @@
         </div>
       </form>
 
-      <a href="/backend/actions/restore_password">I forgot my password</a><br>
-      <a href="register.html" class="text-center">Register a new membership</a>
+      <a href="/backend/actions/restore_password">Olvidé mi contraseña</a><br>
+      <a href="/clientes/login" class="text-center">Entrar como cliente</a>
 
     </div>
     <!-- /.login-box-body -->

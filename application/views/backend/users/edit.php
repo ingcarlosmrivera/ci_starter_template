@@ -1,5 +1,5 @@
-<?php require('/../header.php') ?>
-<?php require('/../sidebar.php') ?>
+<?php require(__DIR__.'/../header.php') ?>
+<?php require(__DIR__.'/../sidebar.php') ?>
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -152,7 +152,7 @@
   </div>
   <!-- /.content-wrapper -->
 
-<?php require('/../footer.php') ?>
+<?php require(__DIR__.'/../footer.php') ?>
 
 <!-- own script -->
 <script>
